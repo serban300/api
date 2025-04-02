@@ -226,6 +226,7 @@ export class WsProvider implements ProviderInterface {
         this.#websocket.onopen = this.#onSocketOpen;
       }
 
+      console.log(`Connecting to WebSocket: ${this.endpoint}`);
       // timeout any handlers that have not had a response
       this.#timeoutId = setInterval(() => this.#timeoutHandlers(), TIMEOUT_INTERVAL);
     } catch (error) {
@@ -624,8 +625,10 @@ export class WsProvider implements ProviderInterface {
     for (let i = 0, count = ids.length; i < count; i++) {
       const handler = this.#handlers[ids[i]];
 
+      console.log(`Request in progress: ${handler.method}. Running time: ${(now - handler.start) / 1000} seconds. Params: ${handler.params}.`);
       if ((now - handler.start) > this.#timeout) {
         try {
+          console.log(`Failing request: ${handler.method} with params: ${handler.params}`);
           handler.callback(new Error(`No response received from RPC endpoint in ${this.#timeout / 1000}s`), undefined);
         } catch {
           // ignore
